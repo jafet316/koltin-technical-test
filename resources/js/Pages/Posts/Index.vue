@@ -5,22 +5,27 @@ import Form from '@/Pages/Posts/Form.vue';
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
 import EditIcon from '../../Components/EditIcon.vue';
+import ChatsContainer from '../../Components/ChatsContainer.vue';
 
 const posts = ref([]);
 const paginateLinks = ref([]);
 const formRef = ref();
+const chatsContainerRef = ref();
 
 const getPosts = () => {
     axios.get(route('posts.getData'))
     .then(response => {
         posts.value = response.data.data; 
         paginateLinks.value = response.data.links;
-        console.log(paginateLinks.value);
     });
 }
 
 const openForm = (post = null) => {
     formRef.value.open(post);
+}
+
+const openChat = post => {
+    chatsContainerRef.value.newChat(post);
 }
 
 onMounted(() => {
@@ -79,10 +84,10 @@ onMounted(() => {
                         <img :src="post.image" :alt="post.title" height="200">
                         <div>
                             <div class="mb-4 text-justify">
-                                {{ post.description }}s
+                                {{ post.description }}
                             </div>
                             
-                            <PrimaryButton class="px-8">
+                            <PrimaryButton class="px-8" @click="openChat(post)">
                                 Chat
                             </PrimaryButton>
                         </div>
@@ -120,4 +125,6 @@ onMounted(() => {
         ref="formRef"
         @post:added="getPosts"
     />
+
+    <ChatsContainer ref="chatsContainerRef"></ChatsContainer>
 </template>

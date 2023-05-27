@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatsController;
 use App\Http\Controllers\PostsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,5 +20,9 @@ Route::middleware([
         Route::post('/', [PostsController::class, 'store']);
         Route::post('/{post}/update', [PostsController::class, 'update'])->name('.update');
         Route::get('/get-data', [PostsController::class, 'getData'])->name('.getData');
+    });
+
+    Route::prefix('/chats')->name('chats')->group(function() {
+        Route::post('/{post}', [ChatsController::class, 'store']);
     });
 });
