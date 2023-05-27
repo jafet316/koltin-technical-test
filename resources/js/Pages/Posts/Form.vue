@@ -10,36 +10,23 @@ import axios from 'axios';
 
 const emit = defineEmits(['close', 'post:added']);
 
-const props = defineProps({
-    show: {
-        type: Boolean,
-        default: false
-    },
-    post: {
-        type: Object,
-        default: () => ({})
-    }
-});
-
 const form = ref({
     name: '',
     description: '',
     image: ''
 });
-
 const errors = ref({});
 const imageInputRef = ref();
 const imagePreviewUrl = ref(null);
-
-const editMode = computed(() => {
-    return Object.keys(props.post).length;
-});
+const editMode = ref(false);
+const show = ref(false);
+const originalPost = ref({});
 
 const submitRoute = computed(() => {
-    return editMode.value ? 'posts.update' : 'posts';
+    return editMode.value ? route('posts.update', originalPost.value.id) : route('posts');
 });
 
-const closeModal = () => {
+const close = () => {
     form.value = {
         name: '',
         description: '',
@@ -49,12 +36,14 @@ const closeModal = () => {
     imageInputRef.value = '';
     imagePreviewUrl.value = '';
 
-    emit('close')
+    show.value = false;
 }
 
-const previewImage = () => {
+const previewImage = (file = null) => {
     const reader = new FileReader();
-    const file = imageInputRef.value.files[0];
+    if(!file) {
+        file = imageInputRef.value.files[0];
+    }
 
     reader.readAsDataURL(file);
     reader.onload = () => {
@@ -76,13 +65,13 @@ const submit = () => {
     formData.append('description', form.value.description)
     formData.append('image', form.value.image);
 
-    axios.post(route(submitRoute.value), formData, {
+    axios.post(submitRoute.value, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
     })
     .then(response => {
-        closeModal();
+        close();
 
         emit('post:added');
     })
@@ -100,16 +89,38 @@ const submit = () => {
     });
 }
 
+const open = (post = null) => {
+    if(post) {
+        originalPost.value = post;
+        form.value = {
+            title: post.title,
+            description: post.description
+        }
+
+        // Get the post image an show the preview
+        axios.get(post.image, { responseType: "blob" })
+        .then(response => {
+            previewImage(response.data);
+        });
+        
+
+        editMode.value = true;
+    }
+
+    show.value = true;
+} 
+
+defineExpose({ open });
 </script>
 
 <template>
-    <DialogModal :show="show" @close="closeModal" >
+    <DialogModal :show="show" @close="close" >
         <template #title>
             <span v-if="!editMode">
                 New Post
             </span>
             <span v-else>
-                Edit post: {{ post.title }}
+                Edit post: {{ originalPost.title }}
             </span>
         </template>
 
@@ -132,7 +143,7 @@ const submit = () => {
                     ref="imageInputRef"
                     type="file"
                     class="mt-1 block w-full"
-                    @change="previewImage"
+                    @change="previewImage()"
                 />
 
                 <InputError :message="errors.image ? errors.image[0] : ''" class="mt-2" />
@@ -146,7 +157,7 @@ const submit = () => {
                     v-model="form.title"
                     type="text"
                     class="mt-1 block w-full"
-                    placeholder="The title of post"
+                    placeholder="The title of the post"
                 />
 
                 <InputError :message="errors.title ? errors.title[0] : ''" class="mt-2" />
@@ -161,7 +172,7 @@ const submit = () => {
                     v-model="form.description"
                     type="textarea"
                     class="mt-1 block w-full"
-                    placeholder="The description of post"
+                    placeholder="The description of the post"
                 />
 
                 <InputError :message="errors.description ? errors.description[0]: ''" class="mt-2" />
@@ -169,7 +180,7 @@ const submit = () => {
         </template>
 
         <template #footer>
-            <SecondaryButton class="mr-2" @click="closeModal">
+            <SecondaryButton class="mr-2" @click="close">
                 Cancel
             </SecondaryButton>
 

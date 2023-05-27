@@ -17,7 +17,7 @@ Route::middleware([
     Route::prefix('/posts')->name('posts')->group(function(){
         Route::get('/', [PostsController::class, 'index']);
         Route::post('/', [PostsController::class, 'store']);
-        Route::post('/update', [PostsController::class, 'update'])->name('.update');
+        Route::post('/{post}/update', [PostsController::class, 'update'])->name('.update');
         Route::get('/get-data', [PostsController::class, 'getData'])->name('.getData');
     });
 });

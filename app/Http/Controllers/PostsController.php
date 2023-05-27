@@ -49,8 +49,35 @@ class PostsController extends Controller
                 'user_id'       => Auth::id(),
                 'title'         => $request->title,
                 'description'   => $request->description,
-                'image'         => 'storage/' . $imagePath
+                'image'         => $imagePath
             ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message'   =>  'ERROR',
+                'errors'    => $th->getMessage()
+            ], 500);
+        }
+
+        return response()->json([
+            'message'   => 'OK',
+        ], 200);
+    }
+
+    /**
+     * Update an exists post
+     * 
+     * @param   \App\Http\Requests\PostRequest $request
+     * @param   \App\Models\Post    $post
+     * @return  \Illuminate\Http\JsonResponse
+     */
+    public function update(PostRequest $request, Post $post): JsonResponse {
+        try {
+            $imagePath = $this->storeImage($request->image);
+            
+            $post->title        = $request->title;
+            $post->description  = $request->description;
+            $post->image        = $imagePath;
+            $post->save();
         } catch (\Throwable $th) {
             return response()->json([
                 'message'   =>  'ERROR',
@@ -78,6 +105,6 @@ class PostsController extends Controller
             throw $th;
         }
 
-        return $imagePath;
+        return 'storage/' . $imagePath;
     }
 }

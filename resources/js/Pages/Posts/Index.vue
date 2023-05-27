@@ -4,10 +4,11 @@ import PrimaryButton  from '@/Components/PrimaryButton.vue';
 import Form from '@/Pages/Posts/Form.vue';
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
+import EditIcon from '../../Components/EditIcon.vue';
 
-const showForm = ref(false);
 const posts = ref([]);
 const paginateLinks = ref([]);
+const formRef = ref();
 
 const getPosts = () => {
     axios.get(route('posts.getData'))
@@ -18,6 +19,10 @@ const getPosts = () => {
     });
 }
 
+const openForm = (post = null) => {
+    formRef.value.open(post);
+}
+
 onMounted(() => {
     getPosts();
 });
@@ -25,7 +30,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <AppLayout title="Dashboard">
+    <AppLayout title="Posts">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Posts
@@ -35,7 +40,7 @@ onMounted(() => {
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="text-right mb-4">
-                    <PrimaryButton @click="showForm = true">
+                    <PrimaryButton @click="openForm">
                         New Post
                     </PrimaryButton>
                 </div>
@@ -54,12 +59,23 @@ onMounted(() => {
                 <div 
                     v-else
                     v-for="post in posts" 
-                    class="bg-white overflow-hidden shadow-xl p-4 mb-4 sm:rounded-lg"
+                    class="bg-white overflow-hidden shadow-xl mb-4 sm:rounded-lg"
                 >
-                    <h1 class=" text-xl">
-                        {{ post.title }}
-                    </h1>
-                    <div class="grid gap-0  grid-cols-[400px_1fr] sm:gap-4">
+                    <div class="grid gap-0 grid-cols-[1fr_100px] border-b p-4">
+                        <div>
+                            <h2 class="text-xl">{{ post.title }}</h2>
+                        </div>
+                        <div class="text-right">
+                            <button 
+                                v-if="post.user_id == $page.props.auth.user.id"
+                                class="hover:text-gray-100"
+                                @click="openForm(post)"
+                            >
+                                <EditIcon />
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid gap-0 grid-cols-1 p-4 sm:grid-cols-[400px_1fr] sm:gap-4">
                         <img :src="post.image" :alt="post.title" height="200">
                         <div>
                             <div class="mb-4 text-justify">
@@ -101,8 +117,7 @@ onMounted(() => {
 
     <!-- Post form -->
     <Form
-        :show="showForm"  
-        @close="showForm = false" 
+        ref="formRef"
         @post:added="getPosts"
     />
 </template>
