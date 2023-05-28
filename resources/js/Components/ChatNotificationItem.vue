@@ -31,7 +31,7 @@ onMounted(() => {
 
         <!-- Chat info -->
         <div>
-            <div v-if="!ownerChat">
+            <div v-if="!ownerChat" class="truncate">
                 <span class="text-gray-700 font-semibold">{{ chat.user.name }}</span> 
                 on 
                 <span class="text-gray-700 font-semibold">{{ chat.post.title }}</span>
