@@ -97,29 +97,6 @@ onMounted(() => {
                         </div>
                     </div>
                 </div>
-
-                <!-- Paginate links -->
-                <ul 
-                    v-if="posts.length"
-                    class="inline-flex items-center -space-x-px"
-                >
-                    <li
-                        v-for="(link, i) in paginateLinks"
-                    >
-                        <button
-                            class="px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-800"
-                            :class="[{
-                                'rounded-l-lg': i == 0, 
-                                'rounded-r-lg': i == paginateLinks.length - 1, 
-                                'text-grey-800 bg-grey-50 hover:bg-grey-100 hover:text-grey-900': link.active,
-                            }]"
-                            @click.prevent="getPage(link.url)"
-                            :title="link.url"
-                        >
-                            <span v-html="link.label"></span>
-                        </button>
-                    </li>
-                </ul>
             </div>
         </div>
     </AppLayout>

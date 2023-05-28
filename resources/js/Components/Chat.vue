@@ -21,9 +21,12 @@ const collapsed = ref(false);
 const input = ref('');
 const inputRef = ref();
 const attachmentInputRef = ref();
+const messagesBoxRef = ref();
 const messages = ref([]);
 const sendingMessage = ref(false);
 const attachment = ref({});
+const paginateMetaData = ref({});
+const lastPageLoaded = ref(0);
 
 const thereIsAttachment = computed(() => attachment.value instanceof File);
 
@@ -33,7 +36,7 @@ const handleNewAttachment = () => {
     if(attachmentInputRef.value.files.length) {
         attachment.value = attachmentInputRef.value.files[0];
     }
-    
+
     inputRef.value.focus();
 }
 
@@ -82,6 +85,36 @@ const sendMessage = e => {
     }
 }
 
+const getMessages = (scrollHeight = null) => {
+    // if already loaded the maximum of pages esc from function
+    if(paginateMetaData.value.last_page && paginateMetaData.value.last_page == lastPageLoaded.value) {
+        return
+    }
+
+    lastPageLoaded.value++;
+
+    return axios.get(route('messages', props.chat.id),  { params: { page: lastPageLoaded.value } })
+    .then(response => {
+        messages.value = [...response.data.data.reverse(), ...messages.value];
+        paginateMetaData.value = response.data.meta;
+
+        if(scrollHeight) {
+            // Force scroll to the last calculated position before load new data
+            messagesBoxRef.value.scroll(0, -(scrollHeight / (response.data.meta.per_page - 1) * response.data.data.length));
+        }
+    })
+    .catch(() => {
+        lastPageLoaded.value--;
+    });
+}
+
+const handleScroll = e => {
+    // Load more data on top off scroll
+    if((e.srcElement.offsetHeight - e.srcElement.scrollTop) >= e.srcElement.scrollHeight) {
+        getMessages(e.srcElement.scrollHeight);
+    }
+}
+
 Echo.private(`chats.${props.chat.id}`)
     .listen('NewChatMessageEvent', (e) => {
         messages.value.push(e.message);
@@ -89,11 +122,8 @@ Echo.private(`chats.${props.chat.id}`)
     });
 
 onMounted(() => {
-    axios.get(route('messages', props.chat.id))
-    .then(response => {
-        messages.value = response.data.data.reverse();
-        inputRef.value.focus();
-    });
+    getMessages();
+    inputRef.value.focus();
 });
 </script>
 <template>
@@ -129,7 +159,9 @@ onMounted(() => {
         <!-- Messages -->
         <div 
             v-show="!collapsed"
+            ref="messagesBoxRef"
             class="h-[300px] py-1 px-4 overflow-y-auto flex flex-col-reverse"
+            @scroll="handleScroll"
         >
             <div>
                 <ChatMessage
