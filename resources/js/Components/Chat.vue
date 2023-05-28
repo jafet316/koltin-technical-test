@@ -2,9 +2,11 @@
 import TimesIcon from '@/Components/TimesIcon.vue';
 import MinimizeIcon from '@/Components/MinimizeIcon.vue';
 import MaximizeIcon from '@/Components/MaximizeIcon.vue';
+import ChatMessage from '@/Components/ChatMessage.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { onMounted, ref } from 'vue';
 import ChatButton from './ChatButton.vue';
+import axios from 'axios';
 
 defineEmits(['close']);
 
@@ -15,6 +17,42 @@ const props = defineProps({
 });
 
 const collapsed = ref(false);
+const input = ref('');
+const inputRef = ref();
+const messages = ref([]);
+const disableInput = ref(true);
+
+const sendMessage = e => {
+   if(e.key == 'Enter' && input.value.length) {
+        disableInput.value = true;
+        axios.post(route('messages', props.chat.id), {
+            message: input.value
+        })
+        .then(response => {
+            input.value = '';
+        })
+        .finally(() => {
+            disableInput.value = false;
+        });
+   }
+}
+
+Echo.private(`chats.${props.chat.id}`)
+    .listen('NewChatMessageEvent', (e) => {
+        console.log(e.message);
+        messages.value.push(e.message);
+    });
+
+onMounted(() => {
+    axios.get(route('messages', props.chat.id))
+    .then(response => {
+        messages.value = response.data.data;
+        inputRef.value.focus();
+    })
+    .finally(() => {
+        disableInput.value = false;
+    });
+});
 </script>
 <template>
     <div class="border bg-white w-[350px] rounded-md" :class="{ 'w-[250px]': collapsed }">
@@ -44,7 +82,7 @@ const collapsed = ref(false);
         </div>
 
         <div
-            v-show="!collapsed" 
+            v-show="!collapsed && chat.user.id != chat.post.user.id" 
             class="font-semibold text-sm text-right px-4"
         >
             Hola: {{ chat.user.name }}
@@ -55,38 +93,11 @@ const collapsed = ref(false);
             v-show="!collapsed"
             class="h-[300px] py-1 px-4 overflow-y-auto"
         >
-            <div>
-                <div class="text-xs font-semibold">
-                    Jafet:
-                </div>
-                <div class="text-xs border rounded-lg p-1 bg-teal-100 w-[80%]">
-                    Lorem ipsum es el texto que se usa habitualmente en diseño gráfico en demostraciones de tipografías o de borradores de diseño para probar el diseño visual antes de insertar el texto final
-                </div>
-            </div>
-            <div>
-                <div class="text-xs font-semibold text-right">
-                    Jafet:
-                </div>
-                <div class="text-xs border rounded-lg p-1 bg-cyan-100 w-[80%] ml-auto">
-                    Lorem ipsum es el texto que se usa habitualmente en diseño gráfico en demostraciones de tipografías o de borradores de diseño para probar el diseño visual antes de insertar el texto final
-                </div>
-            </div>
-            <div>
-                <div class="text-xs font-semibold">
-                    Jafet:
-                </div>
-                <div class="text-xs border rounded-lg p-1 bg-teal-100 w-[80%]">
-                    Lorem ipsum es el texto que se usa habitualmente en diseño gráfico en demostraciones de tipografías o de borradores de diseño para probar el diseño visual antes de insertar el texto final
-                </div>
-            </div>
-            <div>
-                <div class="text-xs font-semibold text-right">
-                    Jafet:
-                </div>
-                <div class="text-xs border rounded-lg p-1 bg-cyan-100 w-[80%] ml-auto">
-                    Lorem ipsum es el texto que se usa habitualmente en diseño gráfico en demostraciones de tipografías o de borradores de diseño para probar el diseño visual antes de insertar el texto final
-                </div>
-            </div>
+            <ChatMessage
+                v-for="(message, i) in messages"
+                :message="message"
+                :same-sender="message.user.id == (messages[i-1] ? messages[i-1].user.id : 0)"
+            />
         </div>
         
         <!-- Input -->
@@ -94,7 +105,15 @@ const collapsed = ref(false);
             v-show="!collapsed"
             class="p-1 relative"
         >
-            <TextInput type="text" class="w-full" placeholder="Hola..."></TextInput>
+            <TextInput 
+                v-model="input"
+                ref="inputRef"
+                type="text" 
+                class="w-full text-sm" 
+                placeholder="Hola..."
+                :disabled="disableInput"
+                @keydown="sendMessage"
+            />
         </div>
     </div>
 </template>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatsController;
+use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\PostsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,5 +25,10 @@ Route::middleware([
 
     Route::prefix('/chats')->name('chats')->group(function() {
         Route::post('/{post}', [ChatsController::class, 'store']);
+    });
+
+    Route::prefix('/messages')->name('messages')->group(function() {
+        Route::get('/{chat}', [MessagesController::class, 'index']);
+        Route::post('/{chat}', [MessagesController::class, 'store']);
     });
 });

@@ -87,7 +87,11 @@ onMounted(() => {
                                 {{ post.description }}
                             </div>
                             
-                            <PrimaryButton class="px-8" @click="openChat(post)">
+                            <PrimaryButton 
+                                class="px-8"
+                                :disabled="$page.props.auth.user.id == post.user_id"
+                                @click="openChat(post)"
+                            >
                                 Chat
                             </PrimaryButton>
                         </div>
