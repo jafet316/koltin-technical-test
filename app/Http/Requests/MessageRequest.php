@@ -26,8 +26,8 @@ class MessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'message'       => 'nullable|string',
-            'attachment'    => 'nullable|file'
+            'message'       => 'required_without:attachment|string',
+            'attachment'    => 'required_without:message|file'
         ];
     }
 }
