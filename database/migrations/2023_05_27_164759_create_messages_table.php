@@ -17,6 +17,9 @@ return new class extends Migration
             $table->foreignId('user_id')->comment('The user who send de message');
             $table->text('message')->nullable();
             $table->string('attachment', 255)->nullable();
+            $table->string('attachment_name', 255)->nullable();
+            $table->string('attachment_size', 255)->nullable();
+            $table->string('attachment_extension', 255)->nullable();
             $table->timestamps();
         });
     }

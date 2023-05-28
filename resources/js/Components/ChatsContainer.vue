@@ -48,7 +48,7 @@ const removeChat = chat => {
 defineExpose({ addChat });
 </script>
 <template>
-    <div class="fixed bottom-0 right-0 z-10 flex items-end gap-2 max-w-full p-2">
+    <div class="fixed bottom-0 right-0 z-10 flex items-end gap-2 max-w-full py-2 px-4">
         <Chat 
             v-for="chat in chats" 
             :chat="chat"

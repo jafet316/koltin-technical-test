@@ -23,7 +23,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-[50px_1fr] gap-2 px-2 py-1 hover:bg-gray-100 text-sm select-none	">
+    <div class="grid grid-cols-[5rem_14rem] gap-2 px-2 py-1 hover:bg-gray-100 text-sm select-none	">
         <!-- Chat img -->
         <div class="w-full">
             <img :src="chat.post.image" :alt="chat.post.title">
@@ -39,7 +39,7 @@ onMounted(() => {
             <div v-else>
                 <span class="text-gray-700 font-semibold">{{ chat.post.title }}</span>
             </div>
-            <div class=" min-h-[20px] mt-1 px-2">
+            <div class=" min-h-[20px] mt-1">
                 <div 
                     v-if="messages.length"
                     class="text-xs"
