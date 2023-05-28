@@ -11,9 +11,11 @@ class MessageRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        $userId = auth()->id();
         $chat = $this->route('chat');
+        $chat->load(['post']);
 
-        return $chat->user_id == auth()->id();
+        return $userId == $chat->user_id || $userId == $chat->post->user_id;
     }
 
     /**

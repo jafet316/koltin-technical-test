@@ -24,7 +24,8 @@ Route::middleware([
     });
 
     Route::prefix('/chats')->name('chats')->group(function() {
-        Route::post('/{post}', [ChatsController::class, 'store']);
+        Route::get('/', [ChatsController::class, 'getData'])->name('.getData');
+        Route::post('/find-or-new/{post}', [ChatsController::class, 'findOrNew'])->name('.findOrNew');
     });
 
     Route::prefix('/messages')->name('messages')->group(function() {

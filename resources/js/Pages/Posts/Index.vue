@@ -24,8 +24,8 @@ const openForm = (post = null) => {
     formRef.value.open(post);
 }
 
-const openChat = post => {
-    chatsContainerRef.value.newChat(post);
+const openChat = (chat = null, post = null) => {
+    chatsContainerRef.value.addChat(chat, post);
 }
 
 onMounted(() => {
@@ -35,7 +35,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <AppLayout title="Posts">
+    <AppLayout title="Posts" @openChat="openChat($event)">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Posts
@@ -88,9 +88,9 @@ onMounted(() => {
                             </div>
                             
                             <PrimaryButton 
+                                v-if="$page.props.auth.user.id != post.user_id"
                                 class="px-8"
-                                :disabled="$page.props.auth.user.id == post.user_id"
-                                @click="openChat(post)"
+                                @click="openChat(null, post)"
                             >
                                 Chat
                             </PrimaryButton>

@@ -20,42 +20,57 @@ const collapsed = ref(false);
 const input = ref('');
 const inputRef = ref();
 const messages = ref([]);
-const disableInput = ref(true);
+const sendingMessage = ref(false);
 
 const sendMessage = e => {
-   if(e.key == 'Enter' && input.value.length) {
-        disableInput.value = true;
+    // Prevent input tab if ther is a message sending
+    if(sendingMessage.value) {
+        return;
+    }
+
+    if(e.key == 'Enter' && input.value.length) {
+        const message = input.value;
+
+        // Clear input
+        input.value = '';
+       
+        sendingMessage.value = true;
         axios.post(route('messages', props.chat.id), {
-            message: input.value
+            message: message
         })
         .then(response => {
-            input.value = '';
+            // TODO: Optimize new message push
+            //messages.value.push(response.data.data);
+        })
+        .catch(() => {
+            input.value = message;
         })
         .finally(() => {
-            disableInput.value = false;
+            sendingMessage.value = false;
+            inputRef.value.focus();
         });
-   }
+    }
 }
 
 Echo.private(`chats.${props.chat.id}`)
     .listen('NewChatMessageEvent', (e) => {
-        console.log(e.message);
         messages.value.push(e.message);
+        messages.value = [...new Set(messages.value)]
     });
 
 onMounted(() => {
     axios.get(route('messages', props.chat.id))
     .then(response => {
-        messages.value = response.data.data;
+        messages.value = response.data.data.reverse();
         inputRef.value.focus();
-    })
-    .finally(() => {
-        disableInput.value = false;
     });
 });
 </script>
 <template>
-    <div class="border bg-white w-[350px] rounded-md" :class="{ 'w-[250px]': collapsed }">
+    <div 
+        class="border bg-white w-[350px] rounded-md shadow-md" 
+        :class="{ 'w-[250px]': collapsed }"
+    >
         <div class="grid grid-cols-[1fr_80px] items-center gap-1 px-1 py-2 border-b">
             <div 
                 class="truncate"
@@ -81,23 +96,18 @@ onMounted(() => {
             </div>
         </div>
 
-        <div
-            v-show="!collapsed && chat.user.id != chat.post.user.id" 
-            class="font-semibold text-sm text-right px-4"
-        >
-            Hola: {{ chat.user.name }}
-        </div>
-
         <!-- Messages -->
         <div 
             v-show="!collapsed"
-            class="h-[300px] py-1 px-4 overflow-y-auto"
+            class="h-[300px] py-1 px-4 overflow-y-auto flex flex-col-reverse"
         >
-            <ChatMessage
-                v-for="(message, i) in messages"
-                :message="message"
-                :same-sender="message.user.id == (messages[i-1] ? messages[i-1].user.id : 0)"
-            />
+            <div>
+                <ChatMessage
+                    v-for="(message, i) in messages"
+                    :message="message"
+                    :same-sender="message.user.id == (messages[i-1] ? messages[i-1].user.id : 0)"
+                />
+            </div>
         </div>
         
         <!-- Input -->
@@ -111,7 +121,6 @@ onMounted(() => {
                 type="text" 
                 class="w-full text-sm" 
                 placeholder="Hola..."
-                :disabled="disableInput"
                 @keydown="sendMessage"
             />
         </div>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
@@ -7,12 +7,17 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import axios from 'axios';
+import ChatNotificationItem from '../Components/ChatNotificationItem.vue';
 
 defineProps({
     title: String,
 });
 
+const emit = defineEmits(['openChat']);
+
 const showingNavigationDropdown = ref(false);
+const chats = ref([]);
 
 const switchToTeam = (team) => {
     router.put(route('current-team.update'), {
@@ -25,6 +30,13 @@ const switchToTeam = (team) => {
 const logout = () => {
     router.post(route('logout'));
 };
+
+onMounted(() => {
+    axios.get(route('chats.getData'))
+    .then(response => {
+        chats.value = response.data.data;
+    });
+});
 </script>
 
 <template>
@@ -114,6 +126,37 @@ const logout = () => {
                                     </template>
                                 </Dropdown>
                             </div>
+
+                            <!-- Settings Dropdown -->
+                            <div class="ml-3 relative">
+                                <Dropdown align="right" width="80">
+                                    <template #trigger>
+                                        <span class="inline-flex rounded-md">
+                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
+                                                <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M8 8H16M8 12H13M3 10C3 4.64706 5.11765 3 12 3C18.8824 3 21 4.64706 21 10C21 15.3529 18.8824 17 12 17C11.6592 17 11.3301 16.996 11.0124 16.9876L7 21V16.4939C4.0328 15.6692 3 13.7383 3 10Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
+                                        </span>
+                                    </template>
+
+                                    <template #content>
+                                        <!-- Account Management -->
+                                        <div class="block px-4 py-2 text-xs text-gray-600">
+                                            Chats
+                                        </div>
+
+                                        <div class="border-t border-gray-200" />
+
+                                        <ChatNotificationItem
+                                            v-for="chat in chats"
+                                            :chat="chat"
+                                            @click="$emit('openChat', chat)"
+                                        />
+                                    </template>
+                                </Dropdown>
+                            </div>
+
 
                             <!-- Settings Dropdown -->
                             <div class="ml-3 relative">

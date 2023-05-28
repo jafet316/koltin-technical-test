@@ -8,6 +8,7 @@ use App\Http\Resources\MessageResource;
 use App\Models\Chat;
 use App\Models\Message;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,14 +18,21 @@ class MessagesController extends Controller
     /**
      * Get the list of messages of the given Chat
      * 
+     * @param   \Illuminate\Http\Request    $request
      * @param   \App\Models\Chat    $chat
      * @return  \Illuminate\Http\JsonResponse
      */
-    public function index(Chat $chat): AnonymousResourceCollection {
+    public function index(Request $request, Chat $chat): AnonymousResourceCollection {
+        $limit = 15;
+
+        if($request->has('single')) {
+            $limit = 1;
+        }
+
         $messages = $chat->messages()
-                    ->with(['user', 'chat.user', 'chat.post.user'])
+                    ->with(['user'])
                     ->orderBy('created_at', 'DESC')
-                    ->paginate(15);
+                    ->paginate($limit);
 
         return MessageResource::collection($messages);
     }
@@ -59,7 +67,8 @@ class MessagesController extends Controller
         }
 
         return response()->json([
-            'message'   => 'OK'
+            'message'   => 'OK',
+            'data'      => new MessageResource($message)
         ]);
     }
 }
