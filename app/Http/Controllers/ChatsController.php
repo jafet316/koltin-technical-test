@@ -26,6 +26,7 @@ class ChatsController extends Controller
                         'post.user'
                     ])
                     //TODO: Order by las active chat
+                    ->orderBy('created_at', 'DESC')
                     ->paginate(15);
 
         return ChatResource::collection($chats);
