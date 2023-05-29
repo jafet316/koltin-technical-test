@@ -25,8 +25,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     });
 
     Route::prefix('/messages')->name('messages')->group(function() {
+        Route::get('/test', [MessagesController::class, 'test'])->name('.test');
         Route::get('/{chat}', [MessagesController::class, 'index']);
         Route::post('/{chat}', [MessagesController::class, 'store']);
         Route::get('/download-attachment/{message}', [MessagesController::class, 'downloadAttachment'])->name('.downloadAttachment');
+        
     });
 });
