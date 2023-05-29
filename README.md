@@ -1,66 +1,44 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Jafet Osorio - Technical Test
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Prueba tecnica para puesto de programador Full Stack.
 
-## About Laravel
+## Requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Asegúrate de tener las siguientes versiones de PHP y npm instaladas en tu entorno de desarrollo:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP versión 8.2.2
+- npm versión 9.4.2
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Instalación
 
-## Learning Laravel
+Sigue estos pasos para instalar y configurar el proyecto:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clona este repositorio en tu máquina local.
+2. Ejecuta el comando `npm install` para instalar las dependencias.
+3. Ejecuta el comando `composer install` para instalar las dependencias de PHP.
+4. Configura el archivo `.env` con las variables de entorno necesarias.
+    - Copia el archivo `.env.example` y renómbralo como `.env`.
+    - Abre el archivo `.env` y configura las siguientes variables de entorno.
+        - `BROADCAST_DRIVER=pusher` Driver de transmisión en tiempo real (para funcionalidad del chat).
+        - `MAIL_DRIVER=smtp`: Driver de envío de correo.
+        - `QUEUE_CONNECTION=database`: Conexión de cola.
+5. Ejecuta el comando `php artisan migrate` para migrar la base de datos.
+6. Ejecuta el comando `php artisan queue:work` para iniciar la cola de Laravel.
+7. Ejecuta el comando `npm run dev` para compilar los assets.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Uso
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Una vez realizado los pasos de instalación restaria registrar cuentas de usuario e ir creando Posts para probar las funcionalidades solicitadas.
 
-## Laravel Sponsors
+El proyecto ya tiene registrado la tarea diaria de envio de chats por correo, pero se puede probar la funcionalidad ejecutando `php artisan app:send-daily-chats `
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
 
-### Premium Partners
+## Pruebas de correo
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+Este proyecto utiliza Mailtrap (link: [https://mailtrap.io/](https://mailtrap.io/)) como servicio de prueba de correo electrónico. Asegúrate de configurar las variables de entorno de correo electrónico con los valores correspondientes proporcionados por Mailtrap para garantizar el correcto envío y recepción de correos electrónicos.
 
-## Contributing
+## Integración con Pusher
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Este proyecto utiliza Pusher (link: [https://pusher.com/](https://pusher.com/)) como servicio de mensajería en tiempo real. Asegúrate de configurar las credenciales de Pusher en el archivo `.env` para aprovechar esta funcionalidad.
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
